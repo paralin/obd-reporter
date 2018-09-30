@@ -1,5 +1,5 @@
 FROM arm32v6/alpine:edge
 RUN apk add --no-cache python3 py3-pip && pip3 install obd prometheus
 WORKDIR /root
-ADD obd.py /root/obd.py
-CMD ["python3", "/root/obd.py"]
+ADD reporter.py /root/reporter.py
+CMD ["python3", "/root/reporter.py"]
