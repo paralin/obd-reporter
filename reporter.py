@@ -12,7 +12,9 @@ from prometheus.collectors import Gauge
 from prometheus.registry import Registry
 from prometheus.exporter import PrometheusMetricHandler
 
+print("Connecting to obd...")
 connection = obd.OBD("/dev/ttyUSB0", 115200)
+print("Connected...")
 PORT_NUMBER = 8081
 def gather_data(registry):
     """Gathers the metrics"""
@@ -32,7 +34,7 @@ def gather_data(registry):
     metrics = [engine_rpm, engine_load, vehicle_speed, coolant_temp, throttle_pos, timing_advance]
     commands = ["RPM", "ENGINE_LOAD", "SPEED", "COOLANT_TEMP", "THROTTLE_POS", "TIMING_ADVANCE"]
     for metric in metrics:
-        registery.register(metric)
+        registry.register(metric)
 
     # Start gathering metrics every half second
     while True:
@@ -41,9 +43,9 @@ def gather_data(registry):
         for idx, metric in enumerate(metrics):
             command = commands[idx]
             response = connection.query(obd.commands[command])
-            if response != None and response.value != None:
+            if response != None and not response.is_null():
                 value = response.value
-                metric.set(value)
+                metric.set({}, value.magnitude)
 
 if __name__ == "__main__":
     # Create the registry
